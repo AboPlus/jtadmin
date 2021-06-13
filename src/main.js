@@ -29,23 +29,21 @@ Vue.prototype.$http = axios
 Vue.config.productionTip = false
 
 /* 定义过滤器 */
-Vue.filter("priceFormat",function(price){
-
-    return (price / 100).toFixed(2)
+Vue.filter('priceFormat', function (price) {
+  return (price / 100).toFixed(2)
 })
 
 /* 将富文本编辑器注册为全局可用的组件 */
 Vue.use(VueQuillEditor)
 
-
 new Vue({
   // Vue对象引入路由机制，
   router,
   // 指定位置渲染的动作 App.vue中进行渲染
-    /*
-    * render函数是vue通过js渲染dom结构的函数createElement，约定可以简写为h
-    * 即h就是createElement函数
-    * $mount(’#app’) ：手动挂载到id为app的dom中的意思
-    * */
+  /*
+  * render函数是vue通过js渲染dom结构的函数createElement，约定可以简写为h
+  * 即h就是createElement函数
+  * $mount(’#app’) ：手动挂载到id为app的dom中的意思
+  * */
   render: h => h(App)
 }).$mount('#app')
