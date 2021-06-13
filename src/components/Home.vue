@@ -81,7 +81,7 @@ export default {
     // 动态获取左侧菜单信息
     this.getMenuList()
     // 设定模式选中按钮
-    this.defaultActive = window.sessionStorage.getItem("activeMenu")
+    this.defaultActive = window.sessionStorage.getItem('activeMenu')
   },
   data () {
     return {

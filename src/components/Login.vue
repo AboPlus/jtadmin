@@ -32,7 +32,7 @@
 
 <!-- 定义JS变量 -->
 <script>
-/* export 对外声明自己的属性信息 */ 
+/* export 对外声明自己的属性信息 */
 export default {
   data () {
     return {
@@ -88,7 +88,7 @@ export default {
         // 3.发起ajax请求，实现业务调用
         // 已经向vue对象中添加全局对象，this.$http就是axios的全局用法  this指的是Login组件
         // eslint-disable-next-line prefer-const
-        let {data: result } = await this.$http.post('user/login',this.loginForm)
+        let { data: result } = await this.$http.post('user/login', this.loginForm)
         // console.log(result)
 
         // 4.判断用户校验是否正常 status=200  如果不加return的话，后续操作也会继续执行
@@ -110,7 +110,6 @@ export default {
             this.$router.push("/home") 在当前组件使用全局路由跳转到home页面
         */
         this.$router.push('/home')
-
       })
     }
   }

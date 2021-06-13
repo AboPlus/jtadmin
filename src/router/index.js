@@ -17,8 +17,8 @@ const routes = [
     path: '/home',
     component: Home,
     children: [
-      { path: '/user', component: User},
-      { path: '/', component: Welcome}
+      { path: '/user', component: User },
+      { path: '/', component: Welcome }
     ]
   }
 ]
@@ -52,7 +52,6 @@ router.beforeEach((to, from, next) => {
 
   // 如果代码执行到这一行，说明用户已经登录，则放行
   next()
-
 })
 
 export default router
