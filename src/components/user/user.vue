@@ -31,7 +31,7 @@
        </el-row>
 
        <!-- 用户数据表格展现  border 边框线属性  -->
-       <!-- 
+       <!--
          :data 就是v-for()  获取user对象
          stripe 隔行变色
          type="index"  表格的索引值，从1开始
@@ -131,198 +131,191 @@
       </span>
     </el-dialog>
 
-
   </div>
 </template>
 
 <script>
 
-  export default {
-    data(){
-      //校验邮箱规则 rule校验规则   value校验的数据   callback回调函数
-      const checkEmail = (rule, value, callback) => {
-        //定义邮箱的正则表达式  JS中用/来表示正则表达式的开始和结束
-        const emailRege = /^[a-zA-Z0-9-_]+@[a-zA-Z0-9-_]+\.[a-zA-Z0-9-_]+$/
-        //正则表达式语法校验  test(xx) 校验成功 返回true  校验失败返回false
-        if (emailRege.test(value)) {
-          //表示邮箱合法 正确返回
-          return callback()
-        }
-        callback(new Error('请填写正确的邮箱地址'))
+export default {
+  data () {
+    // 校验邮箱规则 rule校验规则   value校验的数据   callback回调函数
+    const checkEmail = (rule, value, callback) => {
+      // 定义邮箱的正则表达式  JS中用/来表示正则表达式的开始和结束
+      const emailRege = /^[a-zA-Z0-9-_]+@[a-zA-Z0-9-_]+\.[a-zA-Z0-9-_]+$/
+      // 正则表达式语法校验  test(xx) 校验成功 返回true  校验失败返回false
+      if (emailRege.test(value)) {
+        // 表示邮箱合法 正确返回
+        return callback()
       }
+      callback(new Error('请填写正确的邮箱地址'))
+    }
 
-      //校验手机号的邮箱规则
-      const checkPhone = (rule, value, callback) => {
-
-        //定义校验手机号的正则语法
-        const phoneRege = /^1[34578][0-9]{9}$/
-        if (phoneRege.test(value)) {
-
-          return callback()
-        }
-        callback(new Error('请填写正确的手机号'))
-
+    // 校验手机号的邮箱规则
+    const checkPhone = (rule, value, callback) => {
+      // 定义校验手机号的正则语法
+      const phoneRege = /^1[34578][0-9]{9}$/
+      if (phoneRege.test(value)) {
+        return callback()
       }
+      callback(new Error('请填写正确的手机号'))
+    }
 
-      const checkPassword = (rule, value, callback) => {
-        if(this.addUserModel.password !== value) return callback(new Error('2次密码输入不一致'))
-        //否则校验成功
-        callback()
+    const checkPassword = (rule, value, callback) => {
+      if (this.addUserModel.password !== value) return callback(new Error('2次密码输入不一致'))
+      // 否则校验成功
+      callback()
+    }
+
+    return {
+      queryInfo: {
+        query: '',
+        pageNum: 1,
+        pageSize: 5
+      },
+      userList: [],
+      // 记录总数是数值类型
+      total: 0,
+      dialogVisible: false,
+      addUserModel: {
+        username: '',
+        password: '',
+        password2: '',
+        email: '',
+        phone: ''
+      },
+      // 数据校验规则
+      rules: {
+        username: [
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { min: 3, max: 30, message: '长度在 3 到 30 个字符', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 3, max: 30, message: '长度在 3 到 30 个字符', trigger: 'blur' }
+        ],
+        password2: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 3, max: 30, message: '长度在 3 到 30 个字符', trigger: 'blur' },
+          { validator: checkPassword, trigger: 'blur' }
+        ],
+        phone: [
+          { required: true, message: '请输入手机号', trigger: 'blur' },
+          { min: 3, max: 30, message: '长度在 3 到 30 个字符', trigger: 'blur' },
+          { validator: checkPhone, trigger: 'blur' }
+        ],
+        email: [
+          { required: true, message: '请输入邮箱', trigger: 'blur' },
+          { min: 3, max: 30, message: '长度在 3 到 30 个字符', trigger: 'blur' },
+          { validator: checkEmail, trigger: 'blur' }
+        ]
+      },
+      updateDialogVisible: false,
+      // 定义修改用户数据封装
+      updateUserModel: {
       }
-
-      return {
-        queryInfo: {
-          query: '',
-          pageNum: 1,
-          pageSize: 5
-        },
-        userList: [],
-        //记录总数是数值类型
-        total: 0,
-        dialogVisible: false,
-        addUserModel: {
-          username: '',
-          password: '',
-          password2: '',
-          email:  '',
-          phone:  ''
-        },
-        //数据校验规则
-        rules: {
-          username: [
-                  { required: true, message: '请输入用户名', trigger: 'blur' },
-                  { min: 3, max: 30, message: '长度在 3 到 30 个字符', trigger: 'blur' }
-                ],
-          password: [
-                  { required: true, message: '请输入密码', trigger: 'blur' },
-                  { min: 3, max: 30, message: '长度在 3 到 30 个字符', trigger: 'blur' }
-                ],
-          password2: [
-                  { required: true, message: '请输入密码', trigger: 'blur' },
-                  { min: 3, max: 30, message: '长度在 3 到 30 个字符', trigger: 'blur' },
-                  { validator: checkPassword , trigger: 'blur' }
-                ],
-          phone: [
-                  { required: true, message: '请输入手机号', trigger: 'blur' },
-                  { min: 3, max: 30, message: '长度在 3 到 30 个字符', trigger: 'blur' },
-                  { validator: checkPhone , trigger: 'blur' }
-                ],
-          email: [
-                  { required: true, message: '请输入邮箱', trigger: 'blur' },
-                  { min: 3, max: 30, message: '长度在 3 到 30 个字符', trigger: 'blur' },
-                  { validator: checkEmail , trigger: 'blur' }
-                ]
-        },
-        updateDialogVisible: false,
-        //定义修改用户数据封装
-        updateUserModel: {
-        }
-      }
-
+    }
+  },
+  methods: {
+    async getUserList () {
+      const { data: result } = await this.$http.get('/user/list', {
+        params: this.queryInfo
+      })
+      if (result.status !== 200) return this.$message.error('用户列表查询失败')
+      // console.log(result.data) //{query: "", pageNum: 1, total: 4, rows: Array(4), pageSize: 5}
+      this.userList = result.data.rows
+      this.total = result.data.total
+      console.log('总记录数:' + this.total)
     },
-    methods: {
-      async getUserList(){
-        const {data: result} = await this.$http.get('/user/list',{
-           params: this.queryInfo
-        })
-        if(result.status !== 200) return this.$message.error("用户列表查询失败")
-        //console.log(result.data) //{query: "", pageNum: 1, total: 4, rows: Array(4), pageSize: 5}
-        this.userList = result.data.rows
-        this.total = result.data.total
-        console.log("总记录数:"+this.total)
-      },
-      async updateStatus(user){
-         //实现用户状态修改  注意使用模版字符串  ES6中提出的新用法 ${key}
-        //const {data: result} = await this.$http.put('/user/status/'+user.id+'/'+user.status)
-        const {data: result} = await this.$http.put(`/user/status/${user.id}/${user.status}`)
-        if(result.status !== 200) return this.$message.error("用户状态修改失败!")
-        this.$message.success("用户状态修改成功!")
-      },
-      handleSizeChange(pageSize){
-        //console.log("每页展现的条数"+pageSize)
-        this.queryInfo.pageSize = pageSize
-        this.getUserList()
-      },
-      handleCurrentChange(pageNum){
-        //console.log("页数:"+pageNum)
-        this.queryInfo.pageNum = pageNum
-        this.getUserList()
-      },
-      closeDialog(){
-        //重置表格数据
-        this.$refs.addUserRef.resetFields()
-      },
-      //校验用户数据
-      addUserBtn(){
-        this.$refs.addUserRef.validate(async valid => {
-          //如果校验失败 则停止数据
-          if(!valid) return
-          //console.log(this.addUserModel)
-          const {data: result} = await this.$http.post('/user/addUser',this.addUserModel)
-          if(result.status !== 200) return this.$message.error("用户新增失败")
-          this.$message.success("用户新增成功")
-          //关闭对话框
-          this.dialogVisible = false
-          //重新获取用户列表
-          this.getUserList()
-
-        })
-      },
-      async updateUserBtn(user){
-        this.updateDialogVisible = true
-        const {data: result} = await this.$http.get("/user/"+user.id)
-        if(result.status !== 200) return this.$message.error("用户查询失败")
-        this.updateUserModel = result.data
-      },
-      closeUpdateDialog(){
-        //重置表格数据
-        this.$refs.updateUserRef.resetFields()
-      },
-      updateUser(){
-        //1.预校验数据
-        this.$refs.updateUserRef.validate(async valid => {
-           if(!valid)  return this.$message.error("表单验证没有通过")
-           //根据接口文档要求封装数据
-           let user = {}
-           user.id = this.updateUserModel.id
-           user.phone = this.updateUserModel.phone
-           user.email = this.updateUserModel.email
-           const {data: result} = await this.$http.put(`/user/updateUser`,user)
-           if(result.status !== 200) return this.$message.error("用户修改失败")
-           this.$message.success("用户更新成功")
-           this.updateDialogVisible = false
-           this.getUserList()
-        })
-      },
-      async deleteUser(user){
-         //1.消息确认框
-         const result =  await this.$confirm('此操作将永久删除 '+user.username+', 是否继续?', '提示', {
-                   confirmButtonText: '确定',
-                   cancelButtonText: '取消',
-                   type: 'warning'
-                 }).catch(error => error) //error => error 就是 functiorn(error){return error}
-                 //console.log(result) //确定为confirm 取消为cancel
-
-
-         //如果确认  confirm  如果取消 cancel
-         if(result !== 'confirm'){
-           //如果程序点击取消，则终止代码
-            return this.$message.info("删除取消")
-         }
-         const {data: result2} = await this.$http.delete(`/user/${user.id}`)
-         if(result2.status !== 200) return this.$message.error("删除失败")
-         this.$message.success("删除成功")
-         //重新加载 数据
-         this.getUserList()
-      }
+    async updateStatus (user) {
+      // 实现用户状态修改  注意使用模版字符串  ES6中提出的新用法 ${key}
+      // const {data: result} = await this.$http.put('/user/status/'+user.id+'/'+user.status)
+      const { data: result } = await this.$http.put(`/user/status/${user.id}/${user.status}`)
+      if (result.status !== 200) return this.$message.error('用户状态修改失败!')
+      this.$message.success('用户状态修改成功!')
     },
-    //利用钩子函数实现数据查询
-    mounted(){
+    handleSizeChange (pageSize) {
+      // console.log("每页展现的条数"+pageSize)
+      this.queryInfo.pageSize = pageSize
+      this.getUserList()
+    },
+    handleCurrentChange (pageNum) {
+      // console.log("页数:"+pageNum)
+      this.queryInfo.pageNum = pageNum
+      this.getUserList()
+    },
+    closeDialog () {
+      // 重置表格数据
+      this.$refs.addUserRef.resetFields()
+    },
+    // 校验用户数据
+    addUserBtn () {
+      this.$refs.addUserRef.validate(async valid => {
+        // 如果校验失败 则停止数据
+        if (!valid) return
+        // console.log(this.addUserModel)
+        const { data: result } = await this.$http.post('/user/addUser', this.addUserModel)
+        if (result.status !== 200) return this.$message.error('用户新增失败')
+        this.$message.success('用户新增成功')
+        // 关闭对话框
+        this.dialogVisible = false
+        // 重新获取用户列表
+        this.getUserList()
+      })
+    },
+    async updateUserBtn (user) {
+      this.updateDialogVisible = true
+      const { data: result } = await this.$http.get('/user/' + user.id)
+      if (result.status !== 200) return this.$message.error('用户查询失败')
+      this.updateUserModel = result.data
+    },
+    closeUpdateDialog () {
+      // 重置表格数据
+      this.$refs.updateUserRef.resetFields()
+    },
+    updateUser () {
+      // 1.预校验数据
+      this.$refs.updateUserRef.validate(async valid => {
+        if (!valid) return this.$message.error('表单验证没有通过')
+        // 根据接口文档要求封装数据
+        // eslint-disable-next-line prefer-const
+        let user = {}
+        user.id = this.updateUserModel.id
+        user.phone = this.updateUserModel.phone
+        user.email = this.updateUserModel.email
+        const { data: result } = await this.$http.put('/user/updateUser', user)
+        if (result.status !== 200) return this.$message.error('用户修改失败')
+        this.$message.success('用户更新成功')
+        this.updateDialogVisible = false
+        this.getUserList()
+      })
+    },
+    async deleteUser (user) {
+      // 1.消息确认框
+      const result = await this.$confirm('此操作将永久删除 ' + user.username + ', 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(error => error) // error => error 就是 functiorn(error){return error}
+      // console.log(result) //确定为confirm 取消为cancel
+
+      // 如果确认  confirm  如果取消 cancel
+      if (result !== 'confirm') {
+        // 如果程序点击取消，则终止代码
+        return this.$message.info('删除取消')
+      }
+      const { data: result2 } = await this.$http.delete(`/user/${user.id}`)
+      if (result2.status !== 200) return this.$message.error('删除失败')
+      this.$message.success('删除成功')
+      // 重新加载 数据
       this.getUserList()
     }
+  },
+  // 利用钩子函数实现数据查询
+  mounted () {
+    this.getUserList()
   }
+}
 </script>
-
 
 <style lang="less" scoped>
 
