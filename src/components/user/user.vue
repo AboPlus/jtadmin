@@ -120,7 +120,7 @@
       <!-- 定义用户提交表单数据-->
       <el-form :model="updateUserModel" :rules="rules" ref="updateUserRef" label-width="100px">
         <el-form-item label="用户名" prop="username">
-          <el-input v-model="updateUserModel.username"  disabled ></el-input>
+          <el-input v-model="updateUserModel.username" disabled></el-input>
         </el-form-item>
         <el-form-item label="电话" prop="phone">
           <el-input v-model="updateUserModel.phone"></el-input>
