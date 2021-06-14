@@ -44,15 +44,6 @@
            <el-table-column prop="phone" label="电话"></el-table-column>
            <el-table-column prop="email" label="邮箱"></el-table-column>
            <el-table-column prop="status" label="状态">
-             <!-- 作用域插槽 -->
-             <!-- 多用于表格，用于获取表格中的数据 -->
-             <template slot-scope="scope">
-                <el-switch v-model="scope.row.status" @change="updateStatus(scope.row)"
-                  active-color="#13ce66" inactive-color="#ff4949">
-                </el-switch>
-             </template>
-           </el-table-column>
-           <el-table-column label="操作">
              <!-- slot-scope 作用域插槽(拿到一行的数据)，传递值是父作用域中的源数据改变，值会同步改变。
                   scope.row相当于当前行的数据对象
                   scope.row.status相当于当前行的数据对象的status属性
@@ -60,6 +51,14 @@
                   active-color：switch 打开时的背景色
                   inactive-color：switch 关闭时的背景色
               -->
+             <template slot-scope="scope">
+                <el-switch v-model="scope.row.status" @change="updateStatus(scope.row)"
+                  active-color="#13ce66" inactive-color="#ff4949">
+                </el-switch>
+             </template>
+           </el-table-column>
+           <el-table-column label="操作">
+             <!-- 作用域插槽 -->
              <template slot-scope="scope">
                 <el-button type="primary" icon="el-icon-edit" size="small" @click="updateUserBtn(scope.row)"></el-button>
                 <el-button type="danger" icon="el-icon-delete" size="small" @click="deleteUser(scope.row)"></el-button>
