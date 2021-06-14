@@ -9,8 +9,9 @@
 
         <!-- 登陆表单区域
               ref代表当前表单引用对象,之后form表单可以通过ref进行引用
-             :model 是表格中封装的对象
+             :model 是表格中封装的对象(data中定义的对象),主要用表单验证的，也就是配合el-form的rules和el-form-item的prop来使用的。
              :rules 对整个表单进行数据校验
+             native-type='submit' 实现回车登录
         -->
         <el-form ref="loginFormRef" label-width="0" class="login_form"  :model="loginForm" :rules="rules" @submit.native.prevent >
           <!-- prop 表示需要校验的字段名 -->
@@ -22,7 +23,7 @@
             <el-input  prefix-icon="iconfont iconsuo" type="password" v-model="loginForm.password"></el-input>
           </el-form-item>
           <el-form-item class="btns">
-             <el-button type="primary" round @click="loginBtn" native-type="submit">登录</el-button>
+             <el-button type="primary" round @click="loginBtn" native-type='submit'>登录</el-button>
               <el-button type="info" round @click="resetBtn">重置</el-button>
           </el-form-item>
         </el-form>

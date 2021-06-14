@@ -23,7 +23,7 @@ const routes = [
   }
 ]
 
-// 创建路由对象
+// 创建路由对象，之后可通过this.$router实现全局路由
 const router = new VueRouter({
   routes
 })
