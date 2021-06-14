@@ -53,7 +53,13 @@
              </template>
            </el-table-column>
            <el-table-column label="操作">
-             <!-- 作用域插槽 -->
+             <!-- slot-scope 作用域插槽(拿到一行的数据)，传递值是父作用域中的源数据改变，值会同步改变。
+                  scope.row相当于当前行的数据对象
+                  scope.row.status相当于当前行的数据对象的status属性
+                  @change：switch 状态发生变化时的回调函数
+                  active-color：switch 打开时的背景色
+                  inactive-color：switch 关闭时的背景色
+              -->
              <template slot-scope="scope">
                 <el-button type="primary" icon="el-icon-edit" size="small" @click="updateUserBtn(scope.row)"></el-button>
                 <el-button type="danger" icon="el-icon-delete" size="small" @click="deleteUser(scope.row)"></el-button>
