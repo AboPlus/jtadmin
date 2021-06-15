@@ -35,8 +35,8 @@
           <!-- 定义作用域插槽 定义标签等级-->
           <template slot-scope="scope">
             <el-tag effect="dark" v-if="scope.row.level == 1">一级分类</el-tag>
-            <el-tag effect="dark" type="warning" v-if="scope.row.level == 2">二级分类</el-tag>
-            <el-tag effect="dark" type="danger" v-if="scope.row.level == 3">三级分类</el-tag>
+            <el-tag effect="dark" type="warning" v-else-if="scope.row.level == 2">二级分类</el-tag>
+            <el-tag effect="dark" type="danger" v-else-if="scope.row.level == 3">三级分类</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作">
@@ -91,159 +91,157 @@
 </template>
 
 <script>
-  export default {
-    //定义初始化函数
-    created() {
-      //默认获取商品分类列表数据
-      this.findItemCatList()
-    },
-    data() {
-      return {
-        //定义商品分类数据
-        itemCatList: [],
-        //控制分类对话框的显示
-        addItemCatDialogVisible: false,
-        //定义商品分类新增对象
-        itemCatForm: {
-          name: '', //定义商品分类名称
-          parentId: 0, //默认父级ID=0
-          level: 1 //默认是一级菜单
-        },
-        //定义商品分类校验规则
-        rules: {
-          name: [{
-            required: true,
-            message: '请输入分类名称',
-            trigger: 'blur'
-          }]
-        },
+export default {
+  // 定义初始化函数
+  created () {
+    // 默认获取商品分类列表数据
+    this.findItemCatList()
+  },
+  data () {
+    return {
+      // 定义商品分类数据
+      itemCatList: [],
+      // 控制分类对话框的显示
+      addItemCatDialogVisible: false,
+      // 定义商品分类新增对象
+      itemCatForm: {
+        name: '', // 定义商品分类名称
+        parentId: 0, // 默认父级ID=0
+        level: 1 // 默认是一级菜单
+      },
+      // 定义商品分类校验规则
+      rules: {
+        name: [{
+          required: true,
+          message: '请输入分类名称',
+          trigger: 'blur'
+        }]
+      },
 
-        //定义级联选择项
-        props: {
-          //定义子节点菜单展开方式
-          expandTrigger: "hover",
-          value: "id", //选中数据的value值
-          label: "name", //选中数据展现名称
-          children: "children", //自选项数据
-          checkStrictly: true
-        },
-        //定义用户选中父级ID数组
-        selectedKeys: [],
-        //定义父级商品分类信息只查询一级和二级
-        parentItemCatList: [],
-        //定义修改对话框属性
-        updateItemCatDialogVisible: false,
-        updateItemCatForm: {}
-      }
+      // 定义级联选择项
+      props: {
+        // 定义子节点菜单展开方式
+        expandTrigger: 'hover',
+        value: 'id', // 选中数据的value值
+        label: 'name', // 选中数据展现名称
+        children: 'children', // 自选项数据
+        checkStrictly: true
+      },
+      // 定义用户选中父级ID数组
+      selectedKeys: [],
+      // 定义父级商品分类信息只查询一级和二级
+      parentItemCatList: [],
+      // 定义修改对话框属性
+      updateItemCatDialogVisible: false,
+      updateItemCatForm: {}
+    }
+  },
+  methods: {
+    async findItemCatList () {
+      const { data: result } = await this.$http.get('/itemCat/findItemCatList/3')
+      if (result.status !== 200) return this.$message.error('获取商品分类列表失败!!')
+      this.itemCatList = result.data
     },
-    methods: {
-      async findItemCatList() {
-        const {
-          data: result
-        } = await this.$http.get("/itemCat/findItemCatList/3")
-        if (result.status !== 200) return this.$message.error("获取商品分类列表失败!!")
-        this.itemCatList = result.data
-      },
-      //根据ID修改状态信息
-      async updateStatus(itemCat) {
-        const {
-          data: result
-        } = await this.$http.put(`/itemCat/status/${itemCat.id}/${itemCat.status}`)
-        if (result.status !== 200) return this.$message.error("修改状态失败")
-        this.$message.success("状态修改成功")
-      },
-      //当展现新增商品分类时,应该渲染级联框数据
-      showAddItemCatDialog() {
-        this.findParentItemCatList()
-        this.addItemCatDialogVisible = true
-      },
-      async findParentItemCatList() {
-        //动态获取商品分类信息  type=2表示获取2级商品分类信息
-        const {
-          data: result
-        } = await this.$http.get("/itemCat/findItemCatList/2")
-        if (result.status !== 200) return this.$message.error("获取商品分类列表失败!!")
-        this.parentItemCatList = result.data
-      },
-      //当选择项发生变化时,触发该函数
-      parentItemCatChange() {
-        console.log(this.selectedKeys)
-        console.log(this.itemCatForm)
-        //如果选中节点的长度>0 则表示不是一级商品分类
-        if (this.selectedKeys.length > 0) {
-          //[1,2] 主要获取最后一位
-          this.itemCatForm.parentId = this.selectedKeys[this.selectedKeys.length - 1]
-          //数组级别+1
-          this.itemCatForm.level = this.selectedKeys.length + 1
-        } else {
-          //如果数组长度不大于0 则表示一级商品分类信息
-          this.itemCatForm.parentId = 0
-          this.itemCatForm.level = 1
-        }
-      },
-      async addItemCatForm() {
-        //先将整个表单进行校验
-        this.$refs.itemCatFormRef.validate(async validate => {
-          if (!validate) return
-          const {
-            data: result
-          } = await this.$http.post("/itemCat/saveItemCat", this.itemCatForm)
-          if (result.status !== 200) return this.$message.error("新增商品分类失败")
-          this.$message.success("新增商品分类成功!!!")
-          //新增成功,则刷新分类列表信息
-          this.findItemCatList();
-          this.addItemCatDialogVisible = false
-        })
-      },
-      //当点击关闭按钮时,应该重置整个表单
-      closeAddItemCatDialog() {
-        this.initItemCatForm()
-      },
-      initItemCatForm() {
-        this.$refs.itemCatFormRef.resetFields()
-        //清空form提交其他数据
+    // 根据ID修改状态信息
+    async updateStatus (itemCat) {
+      const {
+        data: result
+      } = await this.$http.put(`/itemCat/status/${itemCat.id}/${itemCat.status}`)
+      if (result.status !== 200) return this.$message.error('修改状态失败')
+      this.$message.success('状态修改成功')
+    },
+    // 当展现新增商品分类时,应该渲染级联框数据
+    showAddItemCatDialog () {
+      this.findParentItemCatList()
+      this.addItemCatDialogVisible = true
+    },
+    async findParentItemCatList () {
+      // 动态获取商品分类信息  type=2表示获取2级商品分类信息
+      const {
+        data: result
+      } = await this.$http.get('/itemCat/findItemCatList/2')
+      if (result.status !== 200) return this.$message.error('获取商品分类列表失败!!')
+      this.parentItemCatList = result.data
+    },
+    // 当选择项发生变化时,触发该函数
+    parentItemCatChange () {
+      console.log(this.selectedKeys)
+      console.log(this.itemCatForm)
+      // 如果选中节点的长度>0 则表示不是一级商品分类
+      if (this.selectedKeys.length > 0) {
+        // [1,2] 主要获取最后一位
+        this.itemCatForm.parentId = this.selectedKeys[this.selectedKeys.length - 1]
+        // 数组级别+1
+        this.itemCatForm.level = this.selectedKeys.length + 1
+      } else {
+        // 如果数组长度不大于0 则表示一级商品分类信息
         this.itemCatForm.parentId = 0
         this.itemCatForm.level = 1
-        //清空级联选择框的数组
-        this.selectedKeys = []
-      },
-      //由于有层级关系,所有修改只能修改名称
-      updateItemCatBtn(itemCat) {
-        this.updateItemCatForm = itemCat
-        this.updateItemCatDialogVisible = true
-      },
-      async updateItemCat() {
-        //修改商品分类信息
+      }
+    },
+    async addItemCatForm () {
+      // 先将整个表单进行校验
+      this.$refs.itemCatFormRef.validate(async validate => {
+        if (!validate) return
         const {
           data: result
-        } = await this.$http.put('/itemCat/updateItemCat', this.updateItemCatForm)
-        if (result.status !== 200) return this.$message.error("更新商品分类失败")
-        this.$message.success("更新商品分类成功")
-        this.findItemCatList();
-        this.updateItemCatDialogVisible = false;
-      },
-      deleteItemCatBtn(itemCat) {
-        //删除商品分类信息,如果为父级节点则需要删除所有的子级信息
-        this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(async () =>{
-          //传递分类id
-          const {data: result} = await this.$http.delete("/itemCat/deleteItemCat",{params:{id:itemCat.id,level:itemCat.level}})
-          if(result.status !== 200) return this.$message.error("删除商品分类失败")
-          this.$message.success("删除数据成功")
-          //删除成功之后,刷新页面数据
-          this.findItemCatList()
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });
-        });
-      }
+        } = await this.$http.post('/itemCat/saveItemCat', this.itemCatForm)
+        if (result.status !== 200) return this.$message.error('新增商品分类失败')
+        this.$message.success('新增商品分类成功!!!')
+        // 新增成功,则刷新分类列表信息
+        this.findItemCatList()
+        this.addItemCatDialogVisible = false
+      })
+    },
+    // 当点击关闭按钮时,应该重置整个表单
+    closeAddItemCatDialog () {
+      this.initItemCatForm()
+    },
+    initItemCatForm () {
+      this.$refs.itemCatFormRef.resetFields()
+      // 清空form提交其他数据
+      this.itemCatForm.parentId = 0
+      this.itemCatForm.level = 1
+      // 清空级联选择框的数组
+      this.selectedKeys = []
+    },
+    // 由于有层级关系,所有修改只能修改名称
+    updateItemCatBtn (itemCat) {
+      this.updateItemCatForm = itemCat
+      this.updateItemCatDialogVisible = true
+    },
+    async updateItemCat () {
+      // 修改商品分类信息
+      const {
+        data: result
+      } = await this.$http.put('/itemCat/updateItemCat', this.updateItemCatForm)
+      if (result.status !== 200) return this.$message.error('更新商品分类失败')
+      this.$message.success('更新商品分类成功')
+      this.findItemCatList()
+      this.updateItemCatDialogVisible = false
+    },
+    deleteItemCatBtn (itemCat) {
+      // 删除商品分类信息,如果为父级节点则需要删除所有的子级信息
+      this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        // 传递分类id
+        const { data: result } = await this.$http.delete('/itemCat/deleteItemCat', { params: { id: itemCat.id, level: itemCat.level } })
+        if (result.status !== 200) return this.$message.error('删除商品分类失败')
+        this.$message.success('删除数据成功')
+        // 删除成功之后,刷新页面数据
+        this.findItemCatList()
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     }
   }
+}
 </script>
 
 <style lang="less" scoped>
