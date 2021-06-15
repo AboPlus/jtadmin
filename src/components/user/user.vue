@@ -26,6 +26,9 @@
          </el-col>
          <el-col :span="4">
             <!-- 定义添加按钮-->
+            <!-- diglog对话框，其内部属性为false时不弹出，为true时弹出对话框
+                 @click="dialogVisible = true" 点击触发dialogVisible = true事件，将true赋值给dialogVisible
+             -->
             <el-button type="primary" @click="dialogVisible = true">添加用户</el-button>
          </el-col>
        </el-row>
@@ -87,7 +90,10 @@
         </el-pagination>
     </el-card>
 
-    <!-- 编辑用户新增对话框 visible.sync 控制对话框的显示-->
+    <!-- 编辑用户新增对话框 visible.sync 控制对话框的显示
+         :visible.sync 同步绑定自定义的属性
+         @close 关闭对话框时执行的操作
+    -->
     <el-dialog title="添加用户" :visible.sync="dialogVisible" width="50%" @close="closeDialog">
 
       <!-- 定义用户提交表单数据-->
@@ -146,18 +152,34 @@ export default {
     // 校验邮箱规则 rule校验规则   value校验的数据   callback回调函数
     const checkEmail = (rule, value, callback) => {
       // 定义邮箱的正则表达式  JS中用/来表示正则表达式的开始和结束
+      /*
+        + 匹配前面的子表达式一次或多次
+        -_ 匹配-和_这两个特殊字符
+        . 匹配除"\n"(换行符)和"\r"(回车符)之外的任何单个字符。
+        \. 匹配一个点
+      */
       const emailRege = /^[a-zA-Z0-9-_]+@[a-zA-Z0-9-_]+\.[a-zA-Z0-9-_]+$/
       // 正则表达式语法校验  test(xx) 校验成功 返回true  校验失败返回false
       if (emailRege.test(value)) {
         // 表示邮箱合法 正确返回
         return callback()
       }
+      // 不合法，用new Error表示
       callback(new Error('请填写正确的邮箱地址'))
     }
 
     // 校验手机号的邮箱规则
     const checkPhone = (rule, value, callback) => {
       // 定义校验手机号的正则语法
+      /*
+        正则JS的语法以/标识正则表达式的开头与结尾
+        正则的语法以^表示开始，以$标识结束
+        1表示第一位是1
+        [] 匹配[]中的全部字符
+        [34578]表示第二位是3、4、5、7、8中的一位
+        [0-9]表示第三位是0-9中的一个数字
+        [0-9]{9}表示匹配九次0-9中的数字
+      */
       const phoneRege = /^1[34578][0-9]{9}$/
       if (phoneRege.test(value)) {
         return callback()
@@ -181,6 +203,7 @@ export default {
       // 记录总数是数值类型
       total: 0,
       dialogVisible: false,
+      // 定义新增用户表单对象
       addUserModel: {
         username: '',
         password: '',
@@ -189,6 +212,7 @@ export default {
         phone: ''
       },
       // 数据校验规则
+      // validator 为表单控件提供校验规则，上面首先要有一个对象，进行数据绑定
       rules: {
         username: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
@@ -271,6 +295,7 @@ export default {
       this.updateDialogVisible = true
       const { data: result } = await this.$http.get('/user/' + user.id)
       if (result.status !== 200) return this.$message.error('用户查询失败')
+      // 如果程序执行成功,则将查询得到的User对象赋值给Vue中的属性
       this.updateUserModel = result.data
     },
     closeUpdateDialog () {
