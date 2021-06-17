@@ -48,12 +48,11 @@
         </el-table-column> -->
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button type="primary" icon="el-icon-edit" size="mini" @click="updateItemBtn(scope.row)">修改</el-button>
+            <el-button type="primary" icon="el-icon-edit" size="mini" @click="updateItemBtn(scope.row)" >修改</el-button>
             <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteItemBtn(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
-
 
       <!-- 定义分页插件-->
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
@@ -63,108 +62,106 @@
 
     </el-card>
 
-
-
   </div>
 </template>
 
 <script>
-  export default {
-    data() {
-      return {
-        //1.定义商品列表信息
-        itemList: [],
-        //2.定义分页对象
-        queryItemInfo: {
-          query: '', //定义查询参数
-          pageNum: 1,
-          pageSize: 10
-        },
-        total: 0
-      }
+export default {
+  data () {
+    return {
+      // 1.定义商品列表信息
+      itemList: [],
+      // 2.定义分页对象
+      queryItemInfo: {
+        query: '', // 定义查询参数
+        pageNum: 1,
+        pageSize: 10
+      },
+      total: 0
+    }
+  },
+  created () {
+    // 1.获取商品列表数据
+    this.getItemList()
+  },
+  methods: {
+    // 实现商品信息分页查询
+    async getItemList () {
+      const {
+        data: result
+      } = await this.$http.get('/item/getItemList', {
+        params: this.queryItemInfo
+      })
+      if (result.status !== 200) return this.$message.error('商品列表查询失败')
+      this.itemList = result.data.rows
+      this.total = result.data.total
     },
-    created() {
-      //1.获取商品列表数据
+    // 通过JS格式化时间
+    formatDate (row, column, cellValue, index) {
+      const date = new Date(cellValue)
+      const year = date.getFullYear()
+      const month = (date.getMonth() + 1 + '').padStart(2, '0')
+      const day = (date.getDate() + '').padStart(2, '0')
+      const HH = (date.getHours() + '').padStart(2, '0')
+      const MM = (date.getMinutes() + '').padStart(2, '0')
+      const SS = (date.getSeconds() + '').padStart(2, '0')
+      return year + '-' + month + '-' + day + ' ' + HH + ':' + MM + ':' + SS
+    },
+    // 条数变化时 调用
+    handleSizeChange (size) {
+      this.queryItemInfo.pageSize = size
       this.getItemList()
     },
-    methods: {
-      //实现商品信息分页查询
-      async getItemList() {
+    // 页码值变化时 调用
+    handleCurrentChange (current) {
+      this.queryItemInfo.pageNum = current
+      this.getItemList()
+    },
+    async updateStatus (item) {
+      const {
+        data: result
+      } = await this.$http.put('/item/updateItemStatus', {
+        id: item.id,
+        status: item.status
+      })
+      if (result.status !== 200) return this.$message.error('更新状态失败')
+      this.$message.success('更新状态成功')
+    },
+    async deleteItemBtn (item) {
+      // 消息确认框
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        // 根据id删除数据
         const {
           data: result
-        } = await this.$http.get("/item/getItemList", {
-          params: this.queryItemInfo
+        } = await this.$http.delete('/item/deleteItemById', {
+          params: {
+            id: item.id
+          }
         })
-        if (result.status !== 200) return this.$message.error("商品列表查询失败")
-        this.itemList = result.data.rows
-        this.total = result.data.total
-      },
-      //通过JS格式化时间
-      formatDate(row, column, cellValue, index) {
-        let date = new Date(cellValue)
-        let year = date.getFullYear()
-        let month = (date.getMonth() + 1 + '').padStart(2, '0')
-        let day = (date.getDate() + '').padStart(2, '0')
-        let HH = (date.getHours() + '').padStart(2, '0')
-        let MM = (date.getMinutes() + '').padStart(2, '0')
-        let SS = (date.getSeconds() + '').padStart(2, '0')
-        return year + '-' + month + '-' + day + ' ' + HH + ":" + MM + ":" + SS
-      },
-      //条数变化时 调用
-      handleSizeChange(size) {
-        this.queryItemInfo.pageSize = size
+        if (result.status !== 200) return this.$message.error('商品删除失败')
+        this.$message.success('商品删除成功')
+        // 重新获取商品列表信息
         this.getItemList()
-      },
-      //页码值变化时 调用
-      handleCurrentChange(current) {
-        this.queryItemInfo.pageNum = current
-        this.getItemList()
-      },
-      async updateStatus(item) {
-        const {
-          data: result
-        } = await this.$http.put("/item/updateItemStatus", {
-          id: item.id,
-          status: item.status
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
         })
-        if (result.status !== 200) return this.$message.error("更新状态失败")
-        this.$message.success("更新状态成功")
-      },
-      async deleteItemBtn(item) {
-        //消息确认框
-        this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(async () => {
-          //根据id删除数据
-          const {
-            data: result
-          } = await this.$http.delete("/item/deleteItemById", {
-            params: {
-              id: item.id
-            }
-          })
-          if (result.status !== 200) return this.$message.error("商品删除失败")
-          this.$message.success("商品删除成功")
-          //重新获取商品列表信息
-          this.getItemList()
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });
-        });
-      },
-      //转向到商品新增页面
-      toAddItem(){
-        this.$router.push("/item/addItem")
-      },
-      updateItemBtn(){
-        console.log("扩展案例,自己实现 只需要修改 标题/卖点/价格/数量")
-      }
+      })
+    },
+    // 转向到商品新增页面
+    toAddItem () {
+      this.$router.push('/item/addItem')
+    },
+    updateItemBtn () {
+      console.log('扩展案例,自己实现 只需要修改 标题/卖点/价格/数量')
     }
   }
+}
 </script>
 <!-- 防止组件样式冲突 -->
 <style lang="less" scoped>

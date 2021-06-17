@@ -36,7 +36,9 @@
           <template slot-scope="scope">
             <el-tag effect="dark" v-if="scope.row.level == 1">一级分类</el-tag>
             <el-tag effect="dark" type="warning" v-else-if="scope.row.level == 2">二级分类</el-tag>
-            <el-tag effect="dark" type="danger" v-else-if="scope.row.level == 3">三级分类</el-tag>
+            <el-tag effect="dark" type="danger" v-else>三级分类</el-tag>
+            <!-- v-else 内部不能含有属性 -->
+            <!-- <el-tag effect="dark" type="danger" v-else-if="scope.row.level == 3">三级分类</el-tag> -->
           </template>
         </el-table-column>
         <el-table-column label="操作">
@@ -183,9 +185,7 @@ export default {
       // 先将整个表单进行校验
       this.$refs.itemCatFormRef.validate(async validate => {
         if (!validate) return
-        const {
-          data: result
-        } = await this.$http.post('/itemCat/saveItemCat', this.itemCatForm)
+        const { data: result } = await this.$http.post('/itemCat/saveItemCat', this.itemCatForm)
         if (result.status !== 200) return this.$message.error('新增商品分类失败')
         this.$message.success('新增商品分类成功!!!')
         // 新增成功,则刷新分类列表信息
@@ -212,9 +212,7 @@ export default {
     },
     async updateItemCat () {
       // 修改商品分类信息
-      const {
-        data: result
-      } = await this.$http.put('/itemCat/updateItemCat', this.updateItemCatForm)
+      const { data: result } = await this.$http.put('/itemCat/updateItemCat', this.updateItemCatForm)
       if (result.status !== 200) return this.$message.error('更新商品分类失败')
       this.$message.success('更新商品分类成功')
       this.findItemCatList()

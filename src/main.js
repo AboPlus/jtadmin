@@ -28,7 +28,10 @@ Vue.prototype.$http = axios
 
 Vue.config.productionTip = false
 
-/* 定义过滤器 */
+/*
+  定义过滤器
+  .toFixed(2) 表示保留两位小数
+*/
 Vue.filter('priceFormat', function (price) {
   return (price / 100).toFixed(2)
 })
