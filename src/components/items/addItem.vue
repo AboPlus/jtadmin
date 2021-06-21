@@ -142,8 +142,8 @@ export default {
       staticTableData: [],
 
       // 定义文件上传路径地址
-      uploadUrl: 'http://localhost:8091/file/upload',
-      // uploadUrl: "http://manage.harrylyj.com/file/upload",
+      // uploadUrl: 'http://localhost:8091/file/upload',
+      uploadUrl: 'http://manage.jt.com/file/upload/',
       // 定义图片网络访问地址
       imageUrlPath: '',
       // 定义图片控制开关
@@ -179,6 +179,9 @@ export default {
     handlePreview (file) {
       // 获取图片的虚拟路径
       this.imageUrlPath = file.response.data.urlPath
+      // const virtualPath = file.response.data.virtualPath
+      // console.log(virtualPath) // D:/photo/2021/06/18/5f5a1d7d669747baa20c6b9f75921572.png
+      // console.log(this.imageUrlPath) // http://image.jt.com/2021/06/18/ced8d7677f2c475387cd6e4f9ca86452.png
       this.dialogImageVisible = true
     },
     // 移除图片的方法
